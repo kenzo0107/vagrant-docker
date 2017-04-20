@@ -3,7 +3,7 @@
 
 Vagrant.configure("2") do |config|
   config.vm.box = "ubuntu/trusty64"
-  config.vm.synced_folder "~/vagrant-docker", "/vagrant", :nfs => true
+  config.vm.synced_folder "./docker", "/vagrant", :nfs => true
 
   config.vm.provider :virtualbox do |vb|
     vb.customize ["modifyvm", :id, "--memory", 4096]  # メモリ調整
