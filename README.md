@@ -12,8 +12,8 @@
 ## Install Steps
 
 ```
-macOS%$ cd ~
 macOS%$ git clone https://github.com/kenzo0107/vagrant-docker
+macOS%$ cd ./vagrant-docker
 macOS%$ vagrant up
 macOS%$ vagrant ssh
 vagrant%$
