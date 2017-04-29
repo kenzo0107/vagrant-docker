@@ -12,7 +12,8 @@ networks:
 
 services:
   prometheus:
-    image: prom/prometheus:v1.6.1
+#    image: prom/prometheus:v1.6.1
+    image: ajeetraina/prometheus-armv7
     container_name: prometheus
     volumes:
       - ./prometheus/:/etc/prometheus/
@@ -35,29 +36,28 @@ services:
 
   node-exporter:
     container_name: node-exporter
-    image: prom/node-exporter:v0.14.0
+#    image: prom/node-exporter:v0.14.0
+    image: zeiot/rpi-node_exporter:0.13.0
     restart: always
     volumes:
       - /proc:/host/proc
       - /sys:/host/sys
       - /:/rootfs
-      - ./node-exporter/collector:/etc/node-exporter
+      - ./node-exporter/collector:/home/collector
     command:
       - '-collector.procfs=/host/proc'
       - '-collector.sysfs=/host/sysfs'
       - '-collector.filesystem.ignored-mount-points="^/(sys|proc|dev|host|etc)($$|/)"'
-#      - '-collector.enabled=attributes,diskstats,filesystem,loadavg,meminfo,netdev,netstat,stat,textfile,time"'
-      - '--collector.textfile.directory=/etc/node-exporter'
-#      - '--collectors.enabled=textfile,time,vmstat,ipvs'
+      - '--collector.textfile.directory=/home/collector'
       - '--collectors.enabled=conntrack,diskstats,entropy,filefd,filesystem,loadavg,mdadm,meminfo,netdev,netstat,stat,textfile,time,vmstat'
-
     expose:
       - 9100
     networks:
       - back-tier
 
   alertmanager:
-    image: prom/alertmanager:v0.6.1
+#    image: prom/alertmanager:v0.6.1
+    image: zeiot/rpi-alertmanager:0.6.1
     ports:
       - 9093:9093
     volumes:
@@ -69,7 +69,7 @@ services:
       - '-storage.path=/alertmanager'
 
   cadvisor:
-    image: google/cadvisor:v0.25.0
+    image: solidnerd/rpi-cadvisor:0.25.0
     volumes:
       - /:/rootfs:ro
       - /var/run:/var/run:rw
@@ -81,7 +81,8 @@ services:
       - back-tier
 
   grafana:
-    image: grafana/grafana:4.2.0
+#    image: grafana/grafana:4.2.0
+    image: fg2it/grafana-armhf:v4.2.0
     depends_on:
       - prometheus
     ports:
