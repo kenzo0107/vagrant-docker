@@ -87,11 +87,8 @@ services:
     container_name: grafana
 #    image: grafana/grafana:4.2.0
     image: fg2it/grafana-armhf:v4.2.0
-    environment:
-      GF_SECURITY_ADMIN_USER: admin-user
-      GF_SECURITY_ADMIN_PASSWORD: admin-pass
-      GF_USERS_ALLOW_SIGN_UP: "false"
-      GF_USERS_ALLOW_ORG_CREATE: "false"
+    env_file:
+      ./grafana/env
     depends_on:
       - prometheus
     volumes:
