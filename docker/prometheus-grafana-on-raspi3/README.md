@@ -1,4 +1,4 @@
-# Prometheus + Node Exporter + Grafana + Cadvisor + Nginx by Docker-compose on Raspberry PI3
+# Prometheus + Node Exporter + Grafana + cAdvisor + Nginx by Docker-compose on Raspberry PI3
 
 ## Precondition
 
