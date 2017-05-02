@@ -1,4 +1,6 @@
 !.gitkeep
+!.keep
 .vagrant
 *.box
 **/_log/*
+.DS_Store
