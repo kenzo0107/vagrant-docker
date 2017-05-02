@@ -1,0 +1,47 @@
+version: '2'
+
+volumes:
+  db-data:
+    driver: local
+
+services:
+  # datastore:
+  #   image: busybox:1.26.2
+  #   container_name: datastore
+  #   volumes:
+  #     - db-data:/var/lib/mysql
+
+  db:
+    image: mysql:5.7.18
+    container_name: mysql
+    extends:
+      file: ./mysql/password.yml
+      service: password
+
+  web:
+    build:
+      context: .
+      dockerfile: ./rails/Dockerfile
+    container_name: rails
+    command: bundle exec puma -C config/puma.rb
+    volumes:
+      - ./rails:/app
+    extends:
+      file: ./mysql/password.yml
+      service: password
+    depends_on:
+      - db
+
+  nginx:
+    build:
+      context: .
+      dockerfile: ./nginx/Dockerfile
+    container_name: nginx
+    ports:
+      - 80:80
+    volumes:
+      - ./_log/nginx:/var/log/nginx
+    volumes_from:
+      - web
+    depends_on:
+      - web
