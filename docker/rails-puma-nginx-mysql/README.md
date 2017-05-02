@@ -4,7 +4,7 @@
 vagrant%$ cd /vagrant/rails-puma-nginx-mysql/
 ```
 
-## docker-comopse 経由で rails 新規プロジェクト作成
+## create rails project via docker-comopse 
 
 ```
 // database = mysql
