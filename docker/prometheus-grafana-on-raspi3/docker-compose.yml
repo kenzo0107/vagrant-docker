@@ -19,6 +19,8 @@ services:
       - ./prometheus/:/etc/prometheus/
       - prometheus_data:/prometheus
     command:
+      - '-storage.local.retention=72h'
+      - '-storage.local.memory-chunks=524288'
       - '-config.file=/etc/prometheus/prometheus.yml'
       - '-storage.local.path=/prometheus'
       - '-alertmanager.url=http://alertmanager:9093'
