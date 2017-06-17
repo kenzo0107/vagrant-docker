@@ -1,0 +1,79 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<nav class="navbar navbar-toggleable-md navbar-inverse fixed-top bg-inverse">
+  <a class="navbar-brand" href="#">toco ちゃんバス あと何分？</a>
+</nav>
+
+<div>&nbsp;</div>
+<div>&nbsp;</div>
+<div>&nbsp;</div>
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-lg-12">
+
+      <h4>循環を選択してください</h4>
+      <div id="flickity">
+        <ul class="js-flickity">
+          {% for id in circuits %}
+          <li class="slide circuit" data-circuit_id="{{ circuits[id].id }}" style="background:{{ circuits[id].bgcolor }}">
+            <span>{{ circuits[id].name }}循環</span>
+          </li>
+          {% endfor %}
+        </ul>
+        <p><button id="select_circuit" type="button" class="btn btn-secondary btn-lg btn-block">この循環を選択する</button></p>
+      </div>
+
+      <h4>停留所を選択してください</h4>
+
+      <?php if(empty($time_tables[$circuit_id])) { ?>
+      {% if message %}
+        該当する停留所データが存在しません。
+      {% else %}
+      <div class="table-responsive">
+        <span class="text-danger">※{{ defaults.exclude_hours|join(',') }}時台は運行しません</span>
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>停留所</th>
+              <th>到着時刻</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {% for id in time_tables[circuit_id] %}
+            <tr>
+              <td>{{ time_tables[circuit_id][id].station }}</td>
+              <td>{{ time_tables[circuit_id][id].arrived_at }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% endif %}
+
+      <div>&nbsp;</div>
+      <div>&nbsp;</div>
+
+      <h3>
+        {{ circuits[circuit_id].name }}循環
+        <span><?=$time_table['station'] ?></span>
+      </h3>
+
+      {% if next_time_tables|length == 0 %}
+        <h4><span>本日のバスは終了しました。</span></h4>
+      {% else %}
+        <div id="flickity">
+          <ul class="js-flickity">
+            {% for next_arrived_at in next_time_tables %}
+            <li class="slide timetable" data-time="{{ next_arrived_at }}"><span></span></li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% endblock %}
