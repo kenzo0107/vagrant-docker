@@ -15,7 +15,7 @@
 
       <h4>循環を選択してください</h4>
       <div id="flickity">
-        <ul class="js-flickity">
+        <ul class="js-flickity" data-flickity-options='{ "wrapAround": true, "initialIndex": {{ circuit_flickity_index }} }'>
           {% for id in circuits %}
           <li class="slide circuit" data-circuit_id="{{ circuits[id].id }}" style="background:{{ circuits[id].bgcolor }}">
             <span>{{ circuits[id].name }}循環</span>
@@ -25,55 +25,52 @@
         <p><button id="select_circuit" type="button" class="btn btn-secondary btn-lg btn-block">この循環を選択する</button></p>
       </div>
 
-      <h4>停留所を選択してください</h4>
+      <div id="block-stations">
+        <div>&nbsp;</div>
+        <div>&nbsp;</div>
+        <div>&nbsp;</div>
+        <h4>停留所を選択してください</h4>
 
-      <?php if(empty($time_tables[$circuit_id])) { ?>
-      {% if message %}
-        該当する停留所データが存在しません。
-      {% else %}
-      <div class="table-responsive">
-        <span class="text-danger">※{{ defaults.exclude_hours|join(',') }}時台は運行しません</span>
-        <table class="table table-striped">
-          <thead>
-            <tr>
-              <th>停留所</th>
-              <th>到着時刻</th>
-            </tr>
-          </thead>
+        {% for cid in time_tables %}
+        <div class="block-circuit table-responsive" data-circuit_id="{{ cid }}" {% if cid != circuit_id %}style="display:none;"{% endif %}>
+          <h4>{{ circuits[cid].name }}循環</h4>
+          {% set exclude_hours = time_tables[cid].exclude_hours %}
+          <span class="text-danger">※{{ exclude_hours|join(',') }}時台は運行しません</span>
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>停留所</th>
+                <th>到着時刻</th>
+                <th></th>
+              </tr>
+            </thead>
 
-          <tbody>
-            {% for id in time_tables[circuit_id] %}
-            <tr>
-              <td>{{ time_tables[circuit_id][id].station }}</td>
-              <td>{{ time_tables[circuit_id][id].arrived_at }}</td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-      {% endif %}
-
-      <div>&nbsp;</div>
-      <div>&nbsp;</div>
-
-      <h3>
-        {{ circuits[circuit_id].name }}循環
-        <span><?=$time_table['station'] ?></span>
-      </h3>
-
-      {% if next_time_tables|length == 0 %}
-        <h4><span>本日のバスは終了しました。</span></h4>
-      {% else %}
-        <div id="flickity">
-          <ul class="js-flickity">
-            {% for next_arrived_at in next_time_tables %}
-            <li class="slide timetable" data-time="{{ next_arrived_at }}"><span></span></li>
-            {% endfor %}
-          </ul>
+            <tbody>
+              {% set stations = time_tables[cid].stations %}
+              {% for sid in stations %}
+              <tr>
+                <td>{{ stations[sid].name }}</td>
+                <td>{{ stations[sid].arrived_at }}</td>
+                <td>
+                  <a href="/ts?circuit_id={{ cid }}&station_id={{ sid }}">
+                    <button type="button" class="btn btn-outline-success set_station_id" data-station_id="{{ sid }}">選択</button>
+                  </a>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
         </div>
-      {% endif %}
+        {% endfor %}
+      </div>
+
+
+      <div>&nbsp;</div>
+      <div>&nbsp;</div>
     </div>
   </div>
 </div>
 
+
+<script src="/static/js/async_set_circuit.js"></script>
 {% endblock %}
