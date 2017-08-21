@@ -1,0 +1,82 @@
+version: '2'
+
+services:
+
+  db:
+    image: mysql:5.7.18
+    container_name: mysql
+    # open port frontend for development.
+    ports:
+      - 3306:3306
+    extends:
+      file: ./mysql/password.yml
+      service: password
+    volumes:
+      - db-data:/var/lib/mysql
+    restart: always
+
+  web:
+    build:
+      context: .
+      dockerfile: ./rails/Dockerfile
+    container_name: rails
+    command: bundle exec puma -C config/puma.rb
+    volumes:
+      - ./rails:/app
+    extends:
+      file: ./mysql/password.yml
+      service: password
+    depends_on:
+      - db
+      - es
+    links:
+      - es
+    environment:
+      ELASTICSEARCH_URL: es
+
+  nginx:
+    build:
+      context: .
+      dockerfile: ./nginx/Dockerfile
+    container_name: nginx
+    ports:
+      - 80:80
+    volumes:
+      - ./_log/nginx:/var/log/nginx
+    volumes_from:
+      - web
+    depends_on:
+      - web
+
+  es:
+    build:
+      context: .
+      dockerfile: ./elasticsearch/Dockerfile
+    container_name: elasticsearch
+    ports:
+      - 9200:9200
+    environment:
+      - http.host=0.0.0.0
+      - transport.host=127.0.0.1
+      - xpack.security.enabled=false
+      - xpack.monitoring.enabled=false
+    volumes:
+      - "es-data:/usr/share/elasticsearch/data"
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:5.5.2
+    container_name: kibana
+    environment:
+      ELASTICSEARCH_URL: es
+    ports:
+      - 5601:5601
+    links:
+      - es
+    depends_on:
+      - es
+
+volumes:
+  db-data:
+    driver: local
+  es-data:
+    driver: local
