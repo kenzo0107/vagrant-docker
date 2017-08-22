@@ -4,7 +4,7 @@
 vagrant%$ cd /vagrant/rails-puma-nginx-mysql/
 ```
 
-## create rails project via docker-comopse 
+## create rails project via docker-comopse
 
 ```
 // database = mysql
@@ -17,8 +17,6 @@ vagrant%$ ls -al ./rails
 ## set puma.rb
 
 ```
-// backup
-vagrant%$ cp ./rails/config/puma.rb ./rails/config/puma.rb.bk
 vagrant%$ cp puma.rb ./rails/config/
 ```
 
@@ -35,23 +33,10 @@ app_root = File.expand_path("../..", __FILE__)
 bind "unix://#{app_root}/tmp/sockets/puma.sock"
 ```
 
-## Create docker image
-
-```
-vagrant%$ docker-compose build
-
-...
-...
-
-Successfully built 021f023d490a
-```
-
 ## set database access information
 
 ```
-// backup
-vagrant%$ cp ./rails/config/database.yml ./rails/config/database.yml.bk
-vagrant%$ cp database.yml ./rails/config/database.yml
+vagrant%$ cp database.yml ./rails/config/
 ```
 
 - ./rails/config/database.yml
