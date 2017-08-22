@@ -5,12 +5,6 @@ volumes:
     driver: local
 
 services:
-  # datastore:
-  #   image: busybox:1.26.2
-  #   container_name: datastore
-  #   volumes:
-  #     - db-data:/var/lib/mysql
-
   db:
     image: mysql:5.7.18
     container_name: mysql
