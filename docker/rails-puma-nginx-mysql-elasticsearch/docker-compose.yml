@@ -67,7 +67,7 @@ services:
     image: docker.elastic.co/kibana/kibana:5.5.2
     container_name: kibana
     environment:
-      ELASTICSEARCH_URL: es
+      ELASTICSEARCH_URL: http://es:9200/
     ports:
       - 5601:5601
     links:
