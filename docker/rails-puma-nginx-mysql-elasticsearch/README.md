@@ -38,7 +38,7 @@ Enter password: (password)
 ```
 vagrant%$ docker-compose exec web rails db:migrate
 
-vagrant%$ docker-compose exec db mysql -u root -p app_development -e'SHOW FULL COLUMNS FROM users;'
+vagrant%$ docker-compose exec db mysql -u root -p app_development -e'show full columns from users;'
 Enter password:
 +------------+--------------+-----------------+------+-----+---------+----------------+---------------------------------+---------+
 | Field      | Type         | Collation       | Null | Key | Default | Extra          | Privileges                      | Comment |
@@ -91,12 +91,22 @@ vagrant%$ curl localhost:9200/_aliases?pretty
 vagrant%$ docker-compose exec web rails elasticsearch:import
 ```
 
+## Kibana
+
+Access [http://192.168.35.101:5601](http://192.168.35.101:5601)
+
 fill in `es-index-users-development` on *Index name or pattern* .
 
 ![Imgur](http://i.imgur.com/DLkDoEs.png)
 
+Click [Discover](http://192.168.35.103:5601/app/kibana#/discover?_g=()) in kibana menu,  
+you see data list of users.
 
 
+## Rails access to Elasticsearch
 
+Access to [http://192.168.35.101/users](http://192.168.35.101/users) from browser.
 
-You access to 'http://192.168.35.101', and see rails's Welcome page.
+You fill in `千葉` to input box and you can see data list related `千葉`.
+
+![Imgur](http://i.imgur.com/rM7Urbu.png)
