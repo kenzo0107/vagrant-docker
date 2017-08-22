@@ -1,73 +1,17 @@
-## Rails 5.1.0 (Puma) + Nginx + Mysql + Elasticsearch by docker-comopse on Vagrant(Ubuntu)
+# Rails (Puma) + Nginx + Mysql + Elasticsearch by docker-comopse on Vagrant(Ubuntu)
+
+## Setup
 
 ```
+macOS%$ git clone https://github.com/kenzo0107/vagrant-docker
+macOS%$ cd vagrant-docker
+macOS%$ vagrant up
+macOS%$ vagrant ssh
 vagrant%$ cd /vagrant/rails-puma-nginx-mysql-elasticsearch/
+vagrant%$ docker-compose up -d
 ```
 
-## create rails project via docker-comopse
-
-```
-// database = mysql
-vagrant%$ docker-compose run --rm web rails new . --force --database=mysql --skip-bundle
-
-// You see new rails project.
-vagrant%$ ls -al ./rails
-```
-
-## set puma.rb
-
-```
-// backup
-vagrant%$ cp ./rails/config/puma.rb ./rails/config/puma.rb.bk
-vagrant%$ cp puma.rb ./rails/config/
-```
-
-- ./rails/config/puma.rb
-
-```
-threads_count = ENV.fetch("RAILS_MAX_THREADS") { 5 }.to_i
-threads threads_count, threads_count
-port        ENV.fetch("PORT") { 3000 }
-environment ENV.fetch("RAILS_ENV") { "development" }
-plugin :tmp_restart
-
-app_root = File.expand_path("../..", __FILE__)
-bind "unix://#{app_root}/tmp/sockets/puma.sock"
-```
-
-## Create docker image
-
-```
-vagrant%$ docker-compose build
-
-...
-...
-
-Successfully built 021f023d490a
-```
-
-## set database access information
-
-```
-// backup
-vagrant%$ cp ./rails/config/database.yml ./rails/config/database.yml.bk
-vagrant%$ cp database.yml ./rails/config/database.yml
-```
-
-- ./rails/config/database.yml
-
-```
-default: &default
-  adapter: mysql2
-  encoding: utf8
-  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
-  username: root
-  password: <%= ENV['MYSQL_ROOT_PASSWORD'] %>  # <--- MYSQL_ROOT_PASSWORD
-  host: db # <--- service name
-```
-
-
-## create database using rails rake
+## create database
 
 ```
 vagrant%$ docker-compose run --rm web rails db:create
@@ -89,20 +33,70 @@ Enter password: (password)
 +--------------------+
 ```
 
-## migrate
+## create table `users`
 
 ```
-vagrant%$ docker-compose run --rm web rails db:migrate
+vagrant%$ docker-compose exec web rails db:migrate
+
+vagrant%$ docker-compose exec db mysql -u root -p app_development -e'SHOW FULL COLUMNS FROM users;'
+Enter password:
++------------+--------------+-----------------+------+-----+---------+----------------+---------------------------------+---------+
+| Field      | Type         | Collation       | Null | Key | Default | Extra          | Privileges                      | Comment |
++------------+--------------+-----------------+------+-----+---------+----------------+---------------------------------+---------+
+| id         | bigint(20)   | NULL            | NO   | PRI | NULL    | auto_increment | select,insert,update,references |         |
+| nickname   | varchar(255) | utf8_general_ci | YES  |     | NULL    |                | select,insert,update,references |         |
+| first_name | varchar(255) | utf8_general_ci | YES  |     | NULL    |                | select,insert,update,references |         |
+| last_name  | varchar(255) | utf8_general_ci | YES  |     | NULL    |                | select,insert,update,references |         |
+| email      | varchar(255) | utf8_general_ci | YES  |     | NULL    |                | select,insert,update,references |         |
+| avatar     | varchar(255) | utf8_general_ci | YES  |     | NULL    |                | select,insert,update,references |         |
+| zip_code   | varchar(255) | utf8_general_ci | YES  |     | NULL    |                | select,insert,update,references |         |
+| state      | varchar(255) | utf8_general_ci | YES  |     | NULL    |                | select,insert,update,references |         |
+| city       | varchar(255) | utf8_general_ci | YES  |     | NULL    |                | select,insert,update,references |         |
+| town       | varchar(255) | utf8_general_ci | YES  |     | NULL    |                | select,insert,update,references |         |
+| latitude   | varchar(255) | utf8_general_ci | YES  |     | NULL    |                | select,insert,update,references |         |
+| longitude  | varchar(255) | utf8_general_ci | YES  |     | NULL    |                | select,insert,update,references |         |
+| birtyday   | date         | NULL            | YES  |     | NULL    |                | select,insert,update,references |         |
+| created_at | datetime     | NULL            | NO   |     | NULL    |                | select,insert,update,references |         |
+| updated_at | datetime     | NULL            | NO   |     | NULL    |                | select,insert,update,references |         |
++------------+--------------+-----------------+------+-----+---------+----------------+---------------------------------+---------+
 ```
 
-## precompile Asset
-
-docker-compose run exec web rails assets:precompile RAILS_ENV=development
-
-## run rails
+## Seed
 
 ```
-vagrant%$ docker-compose up -d
+vagrant%$ docker-compose run --rm web rails db:seed
 ```
+
+## Create the index of Elasticsearch
+
+```
+vagrant%$ docker-compose exec web rails elasticsearch:create_index
+```
+
+check the indexes of elasticsearch.
+
+```
+vagrant%$ curl localhost:9200/_aliases?pretty
+{
+  "es-index-users-development" : {
+    "aliases" : { }
+  },
+  ".kibana" : {
+    "aliases" : { }
+  }
+}
+```
+
+```
+vagrant%$ docker-compose exec web rails elasticsearch:import
+```
+
+fill in `es-index-users-development` on *Index name or pattern* .
+
+![Imgur](http://i.imgur.com/DLkDoEs.png)
+
+
+
+
 
 You access to 'http://192.168.35.101', and see rails's Welcome page.
