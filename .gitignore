@@ -4,3 +4,5 @@
 *.box
 **/_log/*
 .DS_Store
+
+**/rails/*
