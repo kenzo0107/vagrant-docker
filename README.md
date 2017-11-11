@@ -5,8 +5,8 @@
 - Mac OS X 10.12.4
 - Vagrant 1.9.3
 - VirtualBox 5.1.18r114002
-- Ubuntu 14.04.5 LTS
-- Docker 17.04.0-ce
+- Ubuntu 16.04.3 LTS
+- Docker 17.09.0-ce
 - Docker-Compose 1.12.0
 
 ## Box
